@@ -1,4 +1,8 @@
 /*Art is code*/
+html {
+	min-height: 100vh !important;
+}
+
 body {
 	background-color:#cdd5da;
 	background: -webkit-linear-gradient( bottom, #cdd5da, #e8e7e7); 

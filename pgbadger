@@ -207,6 +207,7 @@ my %CLASS_ERROR_CODE = (
 	'XX' => 'Internal Error',
 );
 
+my $query_global_index = 1;
 
 ####
 # method used to fork as many child as wanted
@@ -1683,7 +1684,9 @@ if (!$incremental && ($#given_log_files >= 0) ) {
 			if (!$noprettify) {
 				$sql_prettified = SQL::Beautify->new(keywords => \@beautify_pg_keywords);
 			}
-			&dump_as_html('.');
+			my $current_dir = $outfile;
+			$current_dir =~ s/\w+\.html$//;
+			&dump_as_html('.', $current_dir);
 		}
 		$fh->close;
 	} else {
@@ -2126,7 +2129,8 @@ sub build_incremental_reports
 		if (!$noprettify) {
 			$sql_prettified = SQL::Beautify->new(keywords => \@beautify_pg_keywords);
 		}
-		&dump_as_html('../../..');
+
+		&dump_as_html('../../..', "$outdir/$bpath");
 		$fh->close;
 	}
 
@@ -2173,7 +2177,8 @@ sub build_incremental_reports
 		if (!$noprettify) {
 			$sql_prettified = SQL::Beautify->new(keywords => \@beautify_pg_keywords);
 		}
-		&dump_as_html('../..');
+
+		&dump_as_html('../..', "$outdir/$wdir");
 		$fh->close;
 
 	}
@@ -9096,6 +9101,8 @@ sub print_query_per_host
 
 sub print_lock_queries_report
 {
+	my $path = shift;
+
 	my @top_locked_queries;
 	foreach my $h (keys %normalyzed_info) {
 		if (exists($normalyzed_info{$h}{locks})) {
@@ -9132,7 +9139,9 @@ sub print_lock_queries_report
 		my $min_time = &convert_time($top_locked_queries[$i]->[3]);
 		my $max_time = &convert_time($top_locked_queries[$i]->[4]);
 		my $avg_time = &convert_time($top_locked_queries[$i]->[2] / ($top_locked_queries[$i]->[1] || 1));
-		my $query = &highlight_code($top_locked_queries[$i]->[0]);
+
+		my $short_query = &process_and_extract_query($top_locked_queries[$i]->[0], $path);
+		
 		my $md5 = '';
 		$md5 = 'md5: ' . md5_hex($top_locked_queries[$i]->[0]) if ($enable_checksum);
 		my $example = qq{<p><button type="button" class="btn btn-default btn-xs" data-toggle="collapse" data-target="#queries-most-frequent-waiting-examples-rank-$rank">Examples</button></p>};
@@ -9147,7 +9156,7 @@ sub print_lock_queries_report
 			<td>$max_time</td>
 			<td>$avg_time</td>
 			<td id="queries-most-frequent-waiting-examples-details-rank-$rank">
-				<div id="query-a-$rank" class="sql sql-mediumsize"><i class="glyphicon icon-copy" title="Click to select query"></i>$query</div>$md5
+				<div id="query-a-$rank" class="sql sql-mediumsize"><i class="glyphicon icon-copy" title="Click to select query"></i>$short_query</div>$md5
 				 $example
 			<!-- Examples collapse -->
 			<div id="queries-most-frequent-waiting-examples-rank-$rank" class="collapse">
@@ -9157,7 +9166,9 @@ sub print_lock_queries_report
 			my $idx = 1;
 			foreach my $d (sort {$b <=> $a} keys %{$normalyzed_info{$k}{samples}}) {
 				last if ($idx > $sample);
-				$query = &highlight_code($normalyzed_info{$k}{samples}{$d}{query});
+
+				my $short_query = &process_and_extract_query($normalyzed_info{$k}{samples}{$d}{query}, $path);
+
 				$md5 = '';
 				$md5 = 'md5: ' . md5_hex($normalyzed_info{$k}{samples}{$d}{query}) if ($enable_checksum);
 				my $details = "<b>Date:</b> $normalyzed_info{$k}{samples}{$d}{date}\n";
@@ -9174,7 +9185,7 @@ sub print_lock_queries_report
 				}
 				print $fh qq{
 					<dt>
-						<div id="query-a-$rank-$idx" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$query</div>$md5
+						<div id="query-a-$rank-$idx" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$short_query</div>$md5
 					</dt>
 					<pre>$details</pre>
 					$explain
@@ -9224,7 +9235,8 @@ sub print_lock_queries_report
 
 	$rank = 1;
 	for (my $i = 0 ; $i <= $#top_locked_info ; $i++) {
-		my $query = &highlight_code($top_locked_info[$i]->[2]);
+		my $short_query = &process_and_extract_query($top_locked_info[$i]->[2], $path);
+
 		my $md5 = '';
 		$md5 = 'md5: ' . md5_hex($top_locked_info[$i]->[2]) if ($enable_checksum);
 		my $details = "[ <b>Date:</b> " . ($top_locked_info[$i]->[1] || '');
@@ -9240,7 +9252,7 @@ sub print_lock_queries_report
 				<td>$rank</td>
 				<td>$time</td>
 				<td id="queries-that-waited-most-examples-details-rank-$rank">
-					<div id="query-b-$rank" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$query</div>$md5
+					<div id="query-b-$rank" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$short_query</div>$md5
 					<pre>$details</pre>
 				</td>
 				</tr>
@@ -9261,6 +9273,8 @@ sub print_lock_queries_report
 
 sub print_tempfile_report
 {
+	my $path = shift;
+
 	my @top_temporary = ();
 	foreach my $h (keys %normalyzed_info) {
 		if (exists($normalyzed_info{$h}{tempfiles})) {
@@ -9297,7 +9311,9 @@ sub print_tempfile_report
 			my $min_size = &pretty_print_size($top_temporary[$i]->[3]);
 			my $max_size = &pretty_print_size($top_temporary[$i]->[4]);
 			my $avg_size = &pretty_print_size($top_temporary[$i]->[2] / ($top_temporary[$i]->[1] || 1));
-			my $query = &highlight_code($top_temporary[$i]->[0]);
+			
+			my $short_query = &process_and_extract_query($top_temporary[$i]->[0], $path);
+
 			my $md5 = '';
 			$md5 = 'md5: ' . md5_hex($top_temporary[$i]->[0]) if ($enable_checksum);
 			my $example = qq{<p><button type="button" class="btn btn-default btn-xs" data-toggle="collapse" data-target="#queries-generating-most-temporary-files-examples-rank-$rank">Examples</button></p>};
@@ -9312,7 +9328,7 @@ sub print_tempfile_report
 				<td>$max_size</td>
 				<td>$avg_size</td>
 				<td id="queries-generating-most-temporary-files-examples-details-rank-$rank">
-					<div id="query-c-$rank" class="sql sql-mediumsize"><i class="glyphicon icon-copy" title="Click to select query"></i>$query</div>$md5
+					<div id="query-c-$rank" class="sql sql-mediumsize"><i class="glyphicon icon-copy" title="Click to select query"></i>$short_query</div>$md5
 					$example
 				<!-- Examples collapse -->
 				<div id="queries-generating-most-temporary-files-examples-rank-$rank" class="collapse">
@@ -9322,7 +9338,9 @@ sub print_tempfile_report
 				my $idx = 1;
 				foreach my $d (sort {$b <=> $a} keys %{$normalyzed_info{$k}{samples}}) {
 					last if ($idx > $sample);
-					$query = &highlight_code($normalyzed_info{$k}{samples}{$d}{query});
+
+					my $short_query = &process_and_extract_query($normalyzed_info{$k}{samples}{$d}{query}, $path);
+					
 					my $md5 = '';
 					$md5 = 'md5: ' . md5_hex($normalyzed_info{$k}{samples}{$d}{query}) if ($enable_checksum);
 					my $details = "<b>Date:</b> " . $normalyzed_info{$k}{samples}{$d}{date} . "\n";
@@ -9334,7 +9352,7 @@ sub print_tempfile_report
 					$details .= "<b>Bind query:</b> yes\n" if ($normalyzed_info{$k}{samples}{$d}{bind});
 					print $fh qq{
 						<dt>
-						<div id="query-c-$rank-$idx" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$query</div>$md5
+						<div id="query-c-$rank-$idx" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$short_query</div>$md5
 						
 						</dt>
 						<pre>$details</pre>
@@ -9391,7 +9409,9 @@ sub print_tempfile_report
 			$details .= " - <b>Application:</b> $top_tempfile_info[$i]->[6]" if ($top_tempfile_info[$i]->[6]);
 			$details .= " - <b>Bind yes:</b> yes" if ($top_tempfile_info[$i]->[7]);
 			$details .= " ]";
-			my $query = &highlight_code($top_tempfile_info[$i]->[2]);
+			
+			my $short_query = &process_and_extract_query($top_tempfile_info[$i]->[2], $path);
+
 			my $md5 = '';
 			$md5 = 'md5: ' . md5_hex($top_tempfile_info[$i]->[2]) if ($enable_checksum);
 			print $fh qq{
@@ -9399,7 +9419,7 @@ sub print_tempfile_report
 				<td>$rank</td>
 				<td>$size</td>
 				<td id="queries-generating-largest-temporary-files-examples-details-rank-$rank">
-					<div id="query-d-$rank" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$query</div>$md5
+					<div id="query-d-$rank" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$short_query</div>$md5
 					<pre>$details</pre>
 				</td>
 				</tr>
@@ -9419,6 +9439,8 @@ sub print_tempfile_report
 
 sub print_cancelled_report
 {
+	my $path = shift;
+
 	my @top_cancelled = ();
 	foreach my $h (keys %normalyzed_info) {
 		if (exists($normalyzed_info{$h}{cancelled})) {
@@ -9446,7 +9468,9 @@ sub print_cancelled_report
 		my $rank = 1;
 		for (my $i = 0 ; $i <= $#top_cancelled ; $i++) {
 			my $count = &comma_numbers($top_cancelled[$i]->[1]);
-			my $query = &highlight_code($top_cancelled[$i]->[0]);
+
+			my $short_query = &process_and_extract_query($top_cancelled[$i]->[0], $path);
+			
 			my $md5 = '';
 			$md5 = 'md5: ' . md5_hex($top_cancelled[$i]->[0]) if ($enable_checksum);
 			my $example = qq{<p><button type="button" class="btn btn-default btn-xs" data-toggle="collapse" data-target="#queries-generating-most-cancellation-examples-rank-$rank">Examples</button></p>};
@@ -9457,7 +9481,7 @@ sub print_cancelled_report
 				<td>$rank</td>
 				<td>$count</td>
 				<td id="queries-generating-most-cancellation-examples-details-rank-$rank">
-					<div id="query-c-$rank" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$query</div>$md5
+					<div id="query-c-$rank" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$short_query</div>$md5
 					$example
 				<!-- Examples collapse -->
 				<div id="queries-generating-most-cancellation-examples-rank-$rank" class="collapse">
@@ -9467,7 +9491,8 @@ sub print_cancelled_report
 				my $idx = 1;
 				foreach my $d (sort {$b <=> $a} keys %{$normalyzed_info{$k}{samples}}) {
 					last if ($idx > $sample);
-					$query = &highlight_code($normalyzed_info{$k}{samples}{$d}{query});
+					my $short_query = &process_and_extract_query($normalyzed_info{$k}{samples}{$d}{query}, $path);
+
 					my $md5 = '';
 					$md5 = 'md5: ' . md5_hex($normalyzed_info{$k}{samples}{$d}{query}) if ($enable_checksum);
 					my $details = "Duration: " . &convert_time($d) . "<br />";
@@ -9478,7 +9503,7 @@ sub print_cancelled_report
 					$details .= "Bind query: yes<br/>" if ($normalyzed_info{$k}{samples}{$d}{bind});
 					print $fh qq{
 						<dt>
-						<div id="query-d-$rank-$idx" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$query</div>$md5
+						<div id="query-d-$rank-$idx" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$short_query</div>$md5
 						
 						</dt>
 						<pre>$details</pre>
@@ -9535,7 +9560,9 @@ sub print_cancelled_report
 			$details .= " - <b>Application:</b> $top_cancelled_info[$i]->[6]" if ($top_cancelled_info[$i]->[6]);
 			$details .= " - <b>Bind yes:</b> yes" if ($top_cancelled_info[$i]->[7]);
 			$details .= " ]";
-			my $query = &highlight_code($top_cancelled_info[$i]->[2]);
+
+			my $short_query = &process_and_extract_query($top_cancelled_info[$i]->[2], $path);
+
 			my $md5 = '';
 			$md5 = 'md5: ' . md5_hex($top_cancelled_info[$i]->[2]) if ($enable_checksum);
 			print $fh qq{
@@ -9543,7 +9570,7 @@ sub print_cancelled_report
 				<td>$rank</td>
 				<td>$count</td>
 				<td id="queries-generating-most-cancelled-examples-details-rank-$rank">
-					<div id="query-d-$rank" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$query</div>$md5
+					<div id="query-d-$rank" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$short_query</div>$md5
 					<pre>$details</pre>
 				</td>
 				</tr>
@@ -9638,8 +9665,65 @@ sub print_histogram_query_times
 	delete $drawn_graphs{histogram_query_times_graph};
 }
 
+sub print_query_details
+{
+	my $uri = shift;
+	my $path = shift;
+	my $query = shift;
+	my $index = shift;
+
+	my $oldfh = $fh;
+	$fh = new IO::File ">$path/query-$index.html";
+	if (not defined $fh) {
+		localdie("FATAL: can't write to $path/query-$index.html, $!\n");
+	}
+	&html_header($uri);
+	print $fh qq{
+		<div class="well">
+			<div class="analysis-item row sql">
+				<div class="col-md-12">
+					<pre>$query</pre>
+				</div>
+			</div>
+		</div>
+	};
+
+	&html_footer();
+	$fh->close();
+	$fh = $oldfh;
+}
+
+sub make_short_query
+{
+	my $query = shift;
+	my $index = shift;
+
+	if (($maxlength > 0) && (length($query) > $maxlength)) {
+		return &highlight_code(substr($query, 0, $maxlength)) . "<a href=\"query-$index.html\" target=\"blank\">[...]</a>" 
+	} else {
+		return &highlight_code($query);
+	}
+}
+
+sub process_and_extract_query
+{
+	my $query = shift;
+	my $path = shift;
+
+	my $global_idx = $query_global_index++;
+	my $short_query = &make_short_query($query, $global_idx);
+
+	if (($maxlength > 0) && (length($query) > $maxlength)) {
+		my $pretty_query = &highlight_code($query);
+		&print_query_details('../..', $path, $pretty_query, $global_idx);
+	}
+
+	return $short_query;
+}
+
 sub print_slowest_individual_queries
 {
+	my $path = shift;
 
 	print $fh qq{
 		<div class="analysis-item row" id="slowest-individual-queries">
@@ -9673,7 +9757,9 @@ sub print_slowest_individual_queries
 			my $url = $EXPLAIN_URL . url_escape($top_slowest[$i]->[8]);
 			$explain = "<div id=\"query-d-explain-$rank-$idx\" class=\"sql sql-largesize\"><a href=\"$url\" target=\"explain\" title=\"Click to beautify Explain Plan\"><i class=\"glyphicon icon-compass\"></i><b>Explain plan</b></a></div>\n<pre>" . $top_slowest[$i]->[8] . "</pre>\n";
 		}
-		my $query = &highlight_code($top_slowest[$i]->[2]);
+
+		my $short_query = &process_and_extract_query($top_slowest[$i]->[2], $path);
+
 		my $md5 = '';
 		$md5 = 'md5: ' . md5_hex($top_slowest[$i]->[2]) if ($enable_checksum);
 		print $fh qq{
@@ -9681,7 +9767,7 @@ sub print_slowest_individual_queries
 				<td>$rank</td>
 				<td>$duration</td>
 				<td id="slowest-individual-queries-examples-rank-$rank">
-					<div id="query-d-$rank-$idx" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$query</div>$md5
+					<div id="query-d-$rank-$idx" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$short_query</div>$md5
 					<pre>$details</pre>
 					$explain
 				</td>
@@ -9704,6 +9790,8 @@ sub print_slowest_individual_queries
 
 sub print_time_consuming
 {
+	my $path = shift;
+
 	print $fh qq{
 		<div class="analysis-item row" id="time-consuming-queries">
 			<h2><i class="glyphicon icon-time"></i> Time consuming queries</h2>
@@ -9734,7 +9822,9 @@ sub print_time_consuming
 		my $min = &convert_time($normalyzed_info{$k}{min});
 		my $max = &convert_time($normalyzed_info{$k}{max});
 		my $avg = &convert_time($normalyzed_info{$k}{average});
-		my $query = &highlight_code($k);
+
+		my $short_query = &process_and_extract_query($k, $path);
+
 		my $md5 = '';
 		$md5 = 'md5: ' . md5_hex($k) if ($enable_checksum);
 		my $details = '';
@@ -9804,7 +9894,7 @@ sub print_time_consuming
 				<td>$max</td>
 				<td>$avg</td>
 				<td id="time-consuming-queries-examples-details-rank-$rank">
-					<div id="query-e-$rank" class="sql sql-mediumsize"><i class="glyphicon icon-copy" title="Click to select query"></i>$query</div>$md5
+					<div id="query-e-$rank" class="sql sql-mediumsize"><i class="glyphicon icon-copy" title="Click to select query"></i>$short_query</div>$md5
 						<!-- Details collapse -->
 					    <div id="Atime_consuming_queries_details_$rank" class="collapse">
 						<h3>Times Reported <small>Time consuming queries #$rank</small></h3>
@@ -9901,12 +9991,14 @@ sub print_time_consuming
 				my $url = $EXPLAIN_URL . url_escape($normalyzed_info{$k}{samples}{$d}{plan});
 				$explain = "<div id=\"query-e-explain-$rank-$idx\" class=\"sql sql-largesize\"><a href=\"$url\" target=\"explain\" title=\"Click to beautify Explain Plan\"><i class=\"glyphicon icon-compass\"></i><b>Explain plan</b></a></div>\n<pre>" . $normalyzed_info{$k}{samples}{$d}{plan} . "</pre>\n";
 			}
-			$query = &highlight_code($normalyzed_info{$k}{samples}{$d}{query});
+
+			my $short_query = &process_and_extract_query($normalyzed_info{$k}{samples}{$d}{query}, $path);
+
 			my $md5 = '';
 			$md5 = 'md5: ' . md5_hex($normalyzed_info{$k}{samples}{$d}{query}) if ($enable_checksum);
 			print $fh qq{
 								<dt>
-								<div id="query-e-$rank-$idx" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$query</div>$md5
+								<div id="query-e-$rank-$idx" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$short_query</div>$md5
 								</dt>
 								<pre>$details</pre>
 								$explain
@@ -9937,6 +10029,7 @@ sub print_time_consuming
 
 sub print_most_frequent
 {
+	my $path = shift;
         print $fh qq{
                 <div class="analysis-item row" id="most-frequent-queries">
                         <h2><i class="glyphicon icon-signal"></i> Most frequent queries (N)</h2>
@@ -9965,7 +10058,9 @@ sub print_most_frequent
 		my $min = &convert_time($normalyzed_info{$k}{min});
 		my $max = &convert_time($normalyzed_info{$k}{max});
 		my $avg = &convert_time($normalyzed_info{$k}{average});
-		my $query = &highlight_code($k);
+
+		my $short_query = &process_and_extract_query($k, $path);
+
 		my $md5 = '';
 		$md5 = 'md5: ' . md5_hex($k) if ($enable_checksum);
 		my %hourly_count = ();
@@ -10036,7 +10131,7 @@ sub print_most_frequent
                                 <td>$max</td>
                                 <td>$avg</td>
                                 <td id="most-frequent-queries-examples-details-rank-$rank">
-                                        <div id="query-f-$rank" class="sql sql-mediumsize"><i class="glyphicon icon-copy" title="Click to select query"></i>$query</div>$md5
+                                        <div id="query-f-$rank" class="sql sql-mediumsize"><i class="glyphicon icon-copy" title="Click to select query"></i>$short_query</div>$md5
                                                 <!-- Details collapse -->
                                             <div id="Amost_frequent_queries_details_$rank" class="collapse">
                                                 <h3>Times Reported <small>Time consuming queries #$rank</small></h3>
@@ -10133,12 +10228,14 @@ sub print_most_frequent
 				my $url = $EXPLAIN_URL . url_escape($normalyzed_info{$k}{samples}{$d}{plan});
 				$explain = "<div id=\"query-f-explain-$rank-$idx\" class=\"sql sql-largesize\"><a href=\"$url\" target=\"explain\" title=\"Click to beautify Explain Plan\"><i class=\"glyphicon icon-compass\"></i><b>Explain plan</b></a></div>\n<pre>" . $normalyzed_info{$k}{samples}{$d}{plan} . "</pre>";
 			}
-			$query = &highlight_code($normalyzed_info{$k}{samples}{$d}{query});
+
+			my $short_query = &process_and_extract_query($normalyzed_info{$k}{samples}{$d}{query}, $path);
+
 			my $md5 = '';
 			$md5 = 'md5: ' . md5_hex($normalyzed_info{$k}{samples}{$d}{query}) if ($enable_checksum);
 			print $fh qq{
 								<dt>
-								<div id="query-f-$rank-$idx" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$query</div>$md5
+								<div id="query-f-$rank-$idx" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$short_query</div>$md5
 								</dt>
 								<pre>$details</pre>
 								$explain
@@ -10170,6 +10267,8 @@ sub print_most_frequent
 
 sub print_slowest_queries
 {
+	my $path = shift;
+
 	print $fh qq{
 		<div class="analysis-item row" id="normalized-slowest-queries">
 			<h2><i class="glyphicon icon-time"></i> Normalized slowest queries (N)</h2>
@@ -10200,7 +10299,8 @@ sub print_slowest_queries
                 my $min = &convert_time($normalyzed_info{$k}{min});
                 my $max = &convert_time($normalyzed_info{$k}{max});
                 my $avg = &convert_time($normalyzed_info{$k}{average});
-                my $query = &highlight_code($k);
+                my $short_query = &process_and_extract_query($k, $path);
+
 		my $md5 = '';
 		$md5 = 'md5: ' . md5_hex($k) if ($enable_checksum);
 		my $details = '';
@@ -10272,7 +10372,7 @@ sub print_slowest_queries
                                 </td>
                                 <td>$duration</td>
                                 <td id="normalized-slowest-queries-examples-details-rank-$rank">
-                                        <div id="query-g-$rank" class="sql sql-mediumsize"><i class="glyphicon icon-copy" title="Click to select query"></i>$query</div>$md5
+                                        <div id="query-g-$rank" class="sql sql-mediumsize"><i class="glyphicon icon-copy" title="Click to select query"></i>$short_query</div>$md5
                                                 <!-- Details collapse -->
                                             <div id="Anormalized_slowest_queries_details_$rank" class="collapse">
                                                 <h3>Times Reported <small>Time consuming queries #$rank</small></h3>
@@ -10369,12 +10469,14 @@ sub print_slowest_queries
 				my $url = $EXPLAIN_URL . url_escape($normalyzed_info{$k}{samples}{$d}{plan});
 				$explain = "<div id=\"query-g-explain-$rank-$idx\" class=\"sql sql-largesize\"><a href=\"$url\" target=\"explain\" title=\"Click to beautify Explain Plan\"><i class=\"glyphicon icon-compass\"></i><b>Explain plan</b></a></div>\n<pre>" . $normalyzed_info{$k}{samples}{$d}{plan} . "</pre>\n";
 			}
-			$query = &highlight_code($normalyzed_info{$k}{samples}{$d}{query});
+
+			my $short_query = &process_and_extract_query($normalyzed_info{$k}{samples}{$d}{query}, $path);
+
 			my $md5 = '';
 			$md5 = 'md5: ' . md5_hex($normalyzed_info{$k}{samples}{$d}{query}) if ($enable_checksum);
 			print $fh qq{
 								<dt>
-								<div id="query-g-$rank-$idx" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$query</div>$md5
+								<div id="query-g-$rank-$idx" class="sql sql-largesize"><i class="glyphicon icon-copy" title="Click to select query"></i>$short_query</div>$md5
 								</dt>
 								<pre>$details</pre>
 								$explain
@@ -10407,6 +10509,7 @@ sub dump_as_html
 {
 
 	my $uri = shift;
+	my $path = shift;
 
 	# Dump the html header
 	&html_header($uri);
@@ -10505,7 +10608,7 @@ sub dump_as_html
 			&print_temporary_file();
 
 			# Show information about queries generating temporary files
-			&print_tempfile_report();
+			&print_tempfile_report($path);
 		}
 
 		if (!$disable_autovacuum && !$pgbouncer_only) {
@@ -10527,7 +10630,7 @@ sub dump_as_html
 			&print_lock_type();
 
 			# Show lock wait detailed information
-			&print_lock_queries_report();
+			&print_lock_queries_report($path);
 		}
 
 		if (!$disable_query && !$pgbouncer_only) {
@@ -10555,7 +10658,7 @@ sub dump_as_html
 				&print_cancelled_queries();
 
 				# Show information about cancelled queries
-				&print_cancelled_report();
+				&print_cancelled_report($path);
 
 			}
 
@@ -10567,16 +10670,16 @@ sub dump_as_html
 			&print_histogram_query_times();
 
 			# Show top information
-			&print_slowest_individual_queries();
+			&print_slowest_individual_queries($path);
 
 			# Show queries that took up the most time
-			&print_time_consuming();
+			&print_time_consuming($path);
 
 			# Show most frequent queries
-			&print_most_frequent();
+			&print_most_frequent($path);
 
 			# Print normalized slowest queries
-			&print_slowest_queries
+			&print_slowest_queries($path)
 		}
 
 		# Show pgbouncer sessions and connections statistics
@@ -13430,8 +13533,8 @@ sub store_queries
 		}
 
 		# Truncate the query if requested by the user
-		$cur_info{$t_pid}{query} = substr($cur_info{$t_pid}{query}, 0, $maxlength) . '[...]'
-			if (($maxlength > 0) && (length($cur_info{$t_pid}{query}) > $maxlength));
+		# $cur_info{$t_pid}{query} = substr($cur_info{$t_pid}{query}, 0, $maxlength) . '[...]'
+		#	if (($maxlength > 0) && (length($cur_info{$t_pid}{query}) > $maxlength));
 
 	}
 
