@@ -4873,18 +4873,18 @@ sub html_header
 };
 	if (!$error_only && !$pgbouncer_only) {
 		print $fh qq{
-     		<li id="menu-overview" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Overview <span class="caret"></span></a>
+     		<li id="menu-overview" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="$outfile#">Overview <span class="caret"></span></a>
 			<ul class="dropdown-menu">
-				<li><a href="#global-stats">Global Stats</a></li>
+				<li><a href="$outfile#global-stats">Global Stats</a></li>
 };
 		if (!$disable_hourly) {
 			print $fh qq{
-				<li><a href="#sql-traffic">SQL Traffic</a></li>
-				<li><a href="#select-traffic">Select Traffic</a></li>
-				<li><a href="#write-traffic">Write Traffic</a></li>
-				<li><a href="#duration-traffic">Queries duration</a></li>
-				<li><a href="#prepared-queries-ratio">Prepared queries ratio</a></li>
-				<li><a href="#general-activity">General Activity</a></li>
+				<li><a href="$outfile#sql-traffic">SQL Traffic</a></li>
+				<li><a href="$outfile#select-traffic">Select Traffic</a></li>
+				<li><a href="$outfile#write-traffic">Write Traffic</a></li>
+				<li><a href="$outfile#duration-traffic">Queries duration</a></li>
+				<li><a href="$outfile#prepared-queries-ratio">Prepared queries ratio</a></li>
+				<li><a href="$outfile#general-activity">General Activity</a></li>
 };
 		}
 		print $fh qq{
@@ -4893,18 +4893,18 @@ sub html_header
 };
 		if (!$disable_connection) {
 			print $fh qq{
-     		<li id="menu-connections" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Connections <span class="caret"></span></a>
+     		<li id="menu-connections" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="$outfile#">Connections <span class="caret"></span></a>
      			<ul class="dropdown-menu">
 };
 			if (!$disable_hourly) {
 				print $fh qq{
-     				<li><a href="#established-connections">Established connections</a></li>
+     				<li><a href="$outfile#established-connections">Established connections</a></li>
 };
 			}
 			print $fh qq{
-     				<li><a href="#connections-per-database">Connections per database</a></li>
-     				<li><a href="#connections-per-user">Connections per user</a></li>
-     				<li><a href="#connections-per-host">Connections per host</a></li>
+     				<li><a href="$outfile#connections-per-database">Connections per database</a></li>
+     				<li><a href="$outfile#connections-per-user">Connections per user</a></li>
+     				<li><a href="$outfile#connections-per-host">Connections per host</a></li>
      			</ul>
      		</li>
 };
@@ -4912,32 +4912,32 @@ sub html_header
 
 		if (!$disable_session) {
 			print $fh qq{
-     		<li id="menu-sessions" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Sessions <span class="caret"></span></a>
+     		<li id="menu-sessions" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="$outfile#">Sessions <span class="caret"></span></a>
      			<ul class="dropdown-menu">
 };
 			if (!$disable_hourly) {
 				print $fh qq{
-     				<li><a href="#simultaneous-sessions">Simultaneous sessions</a></li>
+     				<li><a href="$outfile#simultaneous-sessions">Simultaneous sessions</a></li>
 };
 			}
 			print $fh qq{
-     				<li><a href="#histogram-session-times">Histogram of sessions times</a></li>
-     				<li><a href="#sessions-per-database">Sessions per database</a></li>
-     				<li><a href="#sessions-per-user">Sessions per user</a></li>
-     				<li><a href="#sessions-per-host">Sessions per host</a></li>
-     				<li><a href="#sessions-per-app">Sessions per application</a></li>
+     				<li><a href="$outfile#histogram-session-times">Histogram of sessions times</a></li>
+     				<li><a href="$outfile#sessions-per-database">Sessions per database</a></li>
+     				<li><a href="$outfile#sessions-per-user">Sessions per user</a></li>
+     				<li><a href="$outfile#sessions-per-host">Sessions per host</a></li>
+     				<li><a href="$outfile#sessions-per-app">Sessions per application</a></li>
      			</ul>
      		</li>
 };
 		}
 		if (!$disable_checkpoint) {
 			print $fh qq{
-     		<li id="menu-checkpoints" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Checkpoints <span class="caret"></span></a>
+     		<li id="menu-checkpoints" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="$outfile#">Checkpoints <span class="caret"></span></a>
      			<ul class="dropdown-menu">
-     				<li><a href="#checkpoints-buffers">Checkpoints buffers</a></li>
-     				<li><a href="#checkpoints-files">Checkpoints files</a></li>
-     				<li><a href="#checkpoints-distance">Checkpoints distance</a></li>
-     				<li><a href="#checkpoint-activity">Checkpoint activity</a></li> 
+     				<li><a href="$outfile#checkpoints-buffers">Checkpoints buffers</a></li>
+     				<li><a href="$outfile#checkpoints-files">Checkpoints files</a></li>
+     				<li><a href="$outfile#checkpoints-distance">Checkpoints distance</a></li>
+     				<li><a href="$outfile#checkpoint-activity">Checkpoint activity</a></li> 
      			</ul>
      		</li>
 };
@@ -4945,40 +4945,40 @@ sub html_header
 
 		if (!$disable_temporary) {
 			print $fh qq{
-     		<li id="menu-tempfiles" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Temp Files <span class="caret"></span></a>
+     		<li id="menu-tempfiles" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="$outfile#">Temp Files <span class="caret"></span></a>
      			<ul class="dropdown-menu">
-     				<li><a href="#tempfiles-size">Size of temporary files</a></li>
-     				<li><a href="#tempfiles-number">Number of temporary files</a></li>
-     				<li><a href="#tempfiles-activity">Temporary files activity</a></li>
+     				<li><a href="$outfile#tempfiles-size">Size of temporary files</a></li>
+     				<li><a href="$outfile#tempfiles-number">Number of temporary files</a></li>
+     				<li><a href="$outfile#tempfiles-activity">Temporary files activity</a></li>
 				<li class="divider"></li>
-     				<li><a href="#queries-generating-most-temporary-files">Queries generating the most files (N)</a></li>
-     				<li><a href="#queries-generating-largest-temporary-files">Queries generating the largest files</a></li>
+     				<li><a href="$outfile#queries-generating-most-temporary-files">Queries generating the most files (N)</a></li>
+     				<li><a href="$outfile#queries-generating-largest-temporary-files">Queries generating the largest files</a></li>
      			</ul>
 		</li>
 };
 		}
 		if (!$disable_autovacuum) {
 			print $fh qq{
-     		<li id="menu-vacuums" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Vacuums <span class="caret"></span></a>
+     		<li id="menu-vacuums" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="$outfile#">Vacuums <span class="caret"></span></a>
      			<ul class="dropdown-menu">
-     				<li><a href="#vacuums-count">Vacuums distribution</a></li>
-     				<li><a href="#vacuums-activity">Vacuums activity</a></li>
-     				<li><a href="#analyzes-per-table">Analyzes per Tables</a></li>
-     				<li><a href="#vacuums-per-table">Vacuums per Tables</a></li>
-     				<li><a href="#tuples-removed-per-table">Tuples removed</a></li>
-     				<li><a href="#pages-removed-per-table">Page removed</a></li>
+     				<li><a href="$outfile#vacuums-count">Vacuums distribution</a></li>
+     				<li><a href="$outfile#vacuums-activity">Vacuums activity</a></li>
+     				<li><a href="$outfile#analyzes-per-table">Analyzes per Tables</a></li>
+     				<li><a href="$outfile#vacuums-per-table">Vacuums per Tables</a></li>
+     				<li><a href="$outfile#tuples-removed-per-table">Tuples removed</a></li>
+     				<li><a href="$outfile#pages-removed-per-table">Page removed</a></li>
      			</ul>
 		</li>
 };
 		}
 		if (!$disable_lock) {
 			print $fh qq{
-     		<li id="menu-locks" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Locks <span class="caret"></span></a>
+     		<li id="menu-locks" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="$outfile#">Locks <span class="caret"></span></a>
      			<ul class="dropdown-menu">
-     				<li><a href="#locks-type">Locks by type</a></li>
+     				<li><a href="$outfile#locks-type">Locks by type</a></li>
 				<li class="divider"></li>
-     				<li><a href="#queries-most-frequent-waiting">Most frequent waiting queries (N)</a></li>
-     				<li><a href="#queries-that-waited-most">Queries that waited the most</a></li>
+     				<li><a href="$outfile#queries-most-frequent-waiting">Most frequent waiting queries (N)</a></li>
+     				<li><a href="$outfile#queries-that-waited-most">Queries that waited the most</a></li>
      			</ul>
 		</li>
 };
@@ -4986,21 +4986,21 @@ sub html_header
 		if (!$disable_query) {
 			if (!$disable_type) {
 				print $fh qq{
-     		<li id="menu-queries" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Queries <span class="caret"></span></a>
+     		<li id="menu-queries" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="$outfile#">Queries <span class="caret"></span></a>
      			<ul class="dropdown-menu">
-     				<li><a href="#queries-by-type">Queries by type</a></li>
-     				<li><a href="#queries-by-database">Queries by database</a></li>
-     				<li><a href="#queries-by-user">Queries by user</a></li>
-     				<li><a href="#duration-by-user">Duration by user</a></li>
-     				<li><a href="#queries-by-host">Queries by host</a></li>
-     				<li><a href="#queries-by-application">Queries by application</a></li>
+     				<li><a href="$outfile#queries-by-type">Queries by type</a></li>
+     				<li><a href="$outfile#queries-by-database">Queries by database</a></li>
+     				<li><a href="$outfile#queries-by-user">Queries by user</a></li>
+     				<li><a href="$outfile#duration-by-user">Duration by user</a></li>
+     				<li><a href="$outfile#queries-by-host">Queries by host</a></li>
+     				<li><a href="$outfile#queries-by-application">Queries by application</a></li>
 				<li class="divider"></li>
-     				<li><a href="#queries-cancelled-number">Number of cancelled queries</a></li>
+     				<li><a href="$outfile#queries-cancelled-number">Number of cancelled queries</a></li>
 };
 				if ($#top_cancelled_info >= 0) {
 					print $fh qq{
-     				<li><a href="#queries-generating-most-cancellation">Queries generating the most cancellation (N)</a></li>
-     				<li><a href="#queries-generating-most-cancelled">Most cancelled queries</a></li>
+     				<li><a href="$outfile#queries-generating-most-cancellation">Queries generating the most cancellation (N)</a></li>
+     				<li><a href="$outfile#queries-generating-most-cancelled">Most cancelled queries</a></li>
 };
 				}
 				print $fh qq{
@@ -5009,29 +5009,28 @@ sub html_header
 };
 			}
 			print $fh qq{
-     		<li id="menu-topqueries" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Top <span class="caret"></span></a>
+     		<li id="menu-topqueries" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="$outfile#">Top <span class="caret"></span></a>
      			<ul class="dropdown-menu">
-     				<li><a href="#histogram-query-times">Histogram of query times</a></li>
-     				<li><a href="#slowest-individual-queries">Slowest individual queries</a></li>
-     				<li><a href="#time-consuming-queries">Time Consuming queries (N)</a></li>
-     				<li><a href="#most-frequent-queries">Most frequent queries (N)</a></li>
-     				<li><a href="#normalized-slowest-queries">Normalized slowest queries</a></li>
+     				<li><a href="$outfile#histogram-query-times">Histogram of query times</a></li>
+     				<li><a href="$outfile#slowest-individual-queries">Slowest individual queries</a></li>
+     				<li><a href="$outfile#time-consuming-queries">Time Consuming queries (N)</a></li>
+     				<li><a href="$outfile#most-frequent-queries">Most frequent queries (N)</a></li>
+     				<li><a href="$outfile#normalized-slowest-queries">Normalized slowest queries</a></li>
      			</ul>
      		</li>
 };
 		}
 	}
 	if (!$disable_error && !$pgbouncer_only) {
-		my $sqlstate_report = '';
-		$sqlstate_report = '<li><a href="#error-code">Error class distribution</a></li>' if (scalar keys %errors_code > 0);
+		my $sqlstate_report = qq{<li><a href="$outfile#error-code">Error class distribution</a></li>} if (scalar keys %errors_code > 0);
 		print $fh qq{
-     		<li id="menu-events" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Events <span class="caret"></span></a>
+     		<li id="menu-events" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="$outfile#">Events <span class="caret"></span></a>
      			<ul class="dropdown-menu">
-     				<li><a href="#log-levels">Log levels</a></li>
-     				<li><a href="#minutes-errors-levels">Events distribution</a></li>
+     				<li><a href="$outfile#log-levels">Log levels</a></li>
+     				<li><a href="$outfile#minutes-errors-levels">Events distribution</a></li>
 				$sqlstate_report
 				<li class="divider"></li>
-     				<li><a href="#most-frequent-errors-events">Most frequent errors/events</a></li>
+     				<li><a href="$outfile#most-frequent-errors-events">Most frequent errors/events</a></li>
      			</ul>        
      		</li>
 };
@@ -5039,37 +5038,37 @@ sub html_header
 
 	if (exists $pgb_overall_stat{peak}) {
 		print $fh qq{
-     		<li id="menu-pgbouncer" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">PgBouncer <span class="caret"></span></a>
+     		<li id="menu-pgbouncer" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="$outfile#">PgBouncer <span class="caret"></span></a>
      			<ul class="dropdown-menu">
 };
 		if (!$disable_hourly) {
 			print $fh qq{
-     				<li><a href="#pgbsql-traffic">Request Throughput</a></li>
-     				<li><a href="#pgbbytes-traffic">Bytes I/O Throughput</a></li>
-     				<li><a href="#pgbduration-traffic">Queries Average duration</a></li>
+     				<li><a href="$outfile#pgbsql-traffic">Request Throughput</a></li>
+     				<li><a href="$outfile#pgbbytes-traffic">Bytes I/O Throughput</a></li>
+     				<li><a href="$outfile#pgbduration-traffic">Queries Average duration</a></li>
 				<li class="divider"></li>
-     				<li><a href="#pgbsimultaneous-sessions">Simultaneous sessions</a></li>
+     				<li><a href="$outfile#pgbsimultaneous-sessions">Simultaneous sessions</a></li>
 };
 		}
 		print $fh qq{
-     				<li><a href="#pgbhistogram-session-times">Histogram of sessions times</a></li>
-     				<li><a href="#pgbsessions-per-database">Sessions per database</a></li>
-     				<li><a href="#pgbsessions-per-user">Sessions per user</a></li>
-     				<li><a href="#pgbsessions-per-host">Sessions per host</a></li>
+     				<li><a href="$outfile#pgbhistogram-session-times">Histogram of sessions times</a></li>
+     				<li><a href="$outfile#pgbsessions-per-database">Sessions per database</a></li>
+     				<li><a href="$outfile#pgbsessions-per-user">Sessions per user</a></li>
+     				<li><a href="$outfile#pgbsessions-per-host">Sessions per host</a></li>
 				<li class="divider"></li>
 };
 		if (!$disable_hourly) {
 			print $fh qq{
-     				<li><a href="#pgbestablished-connections">Established connections</a></li>
+     				<li><a href="$outfile#pgbestablished-connections">Established connections</a></li>
 };
 		}
 		print $fh qq{
-     				<li><a href="#pgbconnections-per-database">Connections per database</a></li>
-     				<li><a href="#pgbconnections-per-user">Connections per user</a></li>
-     				<li><a href="#pgbconnections-per-host">Connections per host</a></li>
+     				<li><a href="$outfile#pgbconnections-per-database">Connections per database</a></li>
+     				<li><a href="$outfile#pgbconnections-per-user">Connections per user</a></li>
+     				<li><a href="$outfile#pgbconnections-per-host">Connections per host</a></li>
 				<li class="divider"></li>
-     				<li><a href="#pgbmost-used-reserved-pool">Most used reserved pools</a></li>
-     				<li><a href="#pgbmost-frequent-errors-events">Most Frequent Errors/Events</a></li>
+     				<li><a href="$outfile#pgbmost-used-reserved-pool">Most used reserved pools</a></li>
+     				<li><a href="$outfile#pgbmost-frequent-errors-events">Most Frequent Errors/Events</a></li>
      			</ul>
      		</li>
 };
@@ -5241,11 +5240,11 @@ sub print_overall_statistics
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#tab-queries" data-toggle="tab"><i class="glyphicon icon-question-sign"></i> Queries</a></li>
-					<li><a href="#tab-events" data-toggle="tab"><i class="glyphicon icon-bullhorn"></i> Events</a></li>
-					<li><a href="#tab-vacuums" data-toggle="tab"><i class="glyphicon icon-cogs"></i> Vacuums</a></li>
-					<li><a href="#tab-tempfiles" data-toggle="tab"><i class="glyphicon icon-file"></i> Temporary files</a></li>
-					<li><a href="#tab-sessions" data-toggle="tab"><i class="glyphicon icon-off"></i> Sessions</a></li>
-					<li><a href="#tab-connections" data-toggle="tab"><i class="glyphicon icon-external-link-sign"></i> Connections</a></li>
+					<li><a href="$outfile#tab-events" data-toggle="tab"><i class="glyphicon icon-bullhorn"></i> Events</a></li>
+					<li><a href="$outfile#tab-vacuums" data-toggle="tab"><i class="glyphicon icon-cogs"></i> Vacuums</a></li>
+					<li><a href="$outfile#tab-tempfiles" data-toggle="tab"><i class="glyphicon icon-file"></i> Temporary files</a></li>
+					<li><a href="$outfile#tab-sessions" data-toggle="tab"><i class="glyphicon icon-off"></i> Sessions</a></li>
+					<li><a href="$outfile#tab-connections" data-toggle="tab"><i class="glyphicon icon-external-link-sign"></i> Connections</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="tab-queries">
@@ -5484,11 +5483,11 @@ sub print_general_activity
 	<div class="col-md-12 tabbable">
 		<ul class="nav nav-tabs">
 			<li class="active"><a href="#general-activity-queries" data-toggle="tab">Queries</a></li>
-		    <li><a href="#general-activity-select-queries" data-toggle="tab">Read Queries</a></li>
-			<li><a href="#general-activity-write-queries" data-toggle="tab">Write Queries</a></li>
-			<li><a href="#general-activity-prepared-queries" data-toggle="tab">Prepared Queries</a></li>
-			<li><a href="#general-activity-connections" data-toggle="tab">Connections</a></li>
-			<li><a href="#general-activity-sessions" data-toggle="tab">Sessions</a></li>
+		    <li><a href="$outfile#general-activity-select-queries" data-toggle="tab">Read Queries</a></li>
+			<li><a href="$outfile#general-activity-write-queries" data-toggle="tab">Write Queries</a></li>
+			<li><a href="$outfile#general-activity-prepared-queries" data-toggle="tab">Prepared Queries</a></li>
+			<li><a href="$outfile#general-activity-connections" data-toggle="tab">Connections</a></li>
+			<li><a href="$outfile#general-activity-sessions" data-toggle="tab">Sessions</a></li>
 		</ul>
 		<div class="tab-content">
 			<div class="active tab-pane" id="general-activity-queries">
@@ -6286,7 +6285,7 @@ sub print_user_connection
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#connections-per-user-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#connections-per-user-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#connections-per-user-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="connections-per-user-graph">
@@ -6363,7 +6362,7 @@ sub print_user_pgb_connection
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#pgbconnections-per-user-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#pgbconnections-per-user-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#pgbconnections-per-user-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="pgbconnections-per-user-graph">
@@ -6439,7 +6438,7 @@ sub print_host_connection
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#connections-per-host-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#connections-per-host-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#connections-per-host-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="connections-per-host-graph">
@@ -6516,7 +6515,7 @@ sub print_host_pgb_connection
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#pgbconnections-per-host-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#pgbconnections-per-host-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#pgbconnections-per-host-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="pgbconnections-per-host-graph">
@@ -6597,7 +6596,7 @@ sub print_database_connection
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#connections-per-database-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#connections-per-database-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#connections-per-database-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="connections-per-database-graph">
@@ -6678,7 +6677,7 @@ sub print_database_pgb_connection
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#pgbconnections-per-database-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#pgbconnections-per-database-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#pgbconnections-per-database-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="pgbconnections-per-database-graph">
@@ -6818,7 +6817,7 @@ sub print_histogram_session_times
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#histogram-session-times-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#histogram-session-times-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#histogram-session-times-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="histogram-session-times-graph">
@@ -6893,7 +6892,7 @@ sub print_histogram_pgb_session_times
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#pgbhistogram-session-times-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#pgbhistogram-session-times-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#pgbhistogram-session-times-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="pgbhistogram-session-times-graph">
@@ -6973,7 +6972,7 @@ sub print_user_session
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#sessions-per-user-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#sessions-per-user-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#sessions-per-user-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="sessions-per-user-graph">
@@ -7054,7 +7053,7 @@ sub print_user_pgb_session
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#pgbsessions-per-user-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#pgbsessions-per-user-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#pgbsessions-per-user-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="pgbsessions-per-user-graph">
@@ -7135,7 +7134,7 @@ sub print_host_session
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#sessions-per-host-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#sessions-per-host-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#sessions-per-host-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="sessions-per-host-graph">
@@ -7217,7 +7216,7 @@ sub print_host_pgb_session
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#pgbsessions-per-host-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#pgbsessions-per-host-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#pgbsessions-per-host-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="pgbsessions-per-host-graph">
@@ -7299,7 +7298,7 @@ sub print_app_session
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#sessions-per-app-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#sessions-per-app-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#sessions-per-app-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="sessions-per-app-graph">
@@ -7381,7 +7380,7 @@ sub print_database_session
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#sessions-per-database-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#sessions-per-database-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#sessions-per-database-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="sessions-per-database-graph">
@@ -7463,7 +7462,7 @@ sub print_database_pgb_session
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#pgbsessions-per-database-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#pgbsessions-per-database-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#pgbsessions-per-database-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="pgbsessions-per-database-graph">
@@ -7744,9 +7743,9 @@ $drawn_graphs{checkpointdistance_graph}
 	<div class="col-md-12 tabbable">
 		<ul class="nav nav-tabs">
 			<li class="active"><a href="#checkpoint-activity-buffers" data-toggle="tab">Checkpoints Buffers</a></li>
-			<li><a href="#checkpoint-activity-files" data-toggle="tab">Checkpoints files</a></li>
-			<li><a href="#checkpoint-activity-warnings" data-toggle="tab">Checkpoints Warnings</a></li>
-			<li><a href="#checkpoint-activity-distance" data-toggle="tab">Checkpoints distance</a></li>
+			<li><a href="$outfile#checkpoint-activity-files" data-toggle="tab">Checkpoints files</a></li>
+			<li><a href="$outfile#checkpoint-activity-warnings" data-toggle="tab">Checkpoints Warnings</a></li>
+			<li><a href="$outfile#checkpoint-activity-distance" data-toggle="tab">Checkpoints distance</a></li>
 		</ul>
 		<div class="tab-content">
 			<div class="active tab-pane" id="checkpoint-activity-buffers">
@@ -8131,7 +8130,7 @@ sub print_analyze_per_table
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#analyzes-per-table-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#analyzes-per-table-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#analyzes-per-table-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="analyzes-per-table-graph">
@@ -8388,7 +8387,7 @@ sub print_vacuum_per_table
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#vacuums-per-table-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#vacuums-per-table-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#vacuums-per-table-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="vacuums-per-table-graph">
@@ -8481,7 +8480,7 @@ sub print_vacuum_tuple_removed
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#tuples-removed-per-table-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#tuples-removed-per-table-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#tuples-removed-per-table-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="tuples-removed-per-table-graph">
@@ -8577,7 +8576,7 @@ sub print_vacuum_page_removed
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#pages-removed-per-table-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#pages-removed-per-table-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#pages-removed-per-table-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="pages-removed-per-table-graph">
@@ -8675,7 +8674,7 @@ sub print_lock_type
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#locks-types-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#locks-types-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#locks-types-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="locks-types-graph">
@@ -8768,7 +8767,7 @@ sub print_query_type
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#queries-by-type-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#queries-by-type-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#queries-by-type-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="queries-by-type-graph">
@@ -8864,7 +8863,7 @@ sub print_query_per_database
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#queries-by-database-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#queries-by-database-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#queries-by-database-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="queries-by-database-graph">
@@ -8958,7 +8957,7 @@ sub print_query_per_application
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#queries-by-application-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#queries-by-application-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#queries-by-application-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="queries-by-application-graph">
@@ -9066,7 +9065,7 @@ sub print_query_per_user
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#queries-by-user-graph" data-toggle="tab">Queries Chart</a></li>
-					<li><a href="#queries-by-user-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#queries-by-user-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="queries-by-user-graph">
@@ -9109,7 +9108,7 @@ sub print_query_per_user
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#duration-by-user-graph" data-toggle="tab">Duration Chart</a></li>
-					<li><a href="#duration-by-user-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#duration-by-user-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="duration-by-user-graph">
@@ -9205,7 +9204,7 @@ sub print_query_per_host
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#queries-by-host-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#queries-by-host-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#queries-by-host-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="queries-by-host-graph">
@@ -9786,7 +9785,7 @@ sub print_histogram_query_times
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#histogram-query-times-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#histogram-query-times-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#histogram-query-times-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="histogram-query-times-graph">
@@ -11095,7 +11094,7 @@ sub print_log_level
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#log-level-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#log-level-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#log-level-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="log-level-graph">
@@ -11205,7 +11204,7 @@ sub print_error_code
 			<div class="tabbable">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#error-code-graph" data-toggle="tab">Chart</a></li>
-					<li><a href="#error-code-table" data-toggle="tab">Table</a></li>
+					<li><a href="$outfile#error-code-table" data-toggle="tab">Table</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="error-code-graph">
