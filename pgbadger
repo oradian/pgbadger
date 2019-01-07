@@ -15701,8 +15701,6 @@ sub query {
 
     $self->{ 'query' } = $new_value if defined $new_value;
 
-    print STDERR "Query: $new_value\n";
-
     my $i = 0;
     my %temp_placeholder = ();
     my @temp_content = split(/(CREATE(?:\s+OR\s+REPLACE)?\s+(?:FUNCTION|PROCEDURE)\s+)/i, $self->{ 'query' });
@@ -16257,7 +16255,7 @@ sub beautify {
             $self->{ '_is_in_create' }++ if ($self->{ '_is_in_create' });
             $self->_add_token( $token, $last );
             if ( !$self->{ '_is_in_index' }) {
-                if ((defined last && uc($last) eq 'AS') || $self->{ '_is_in_create' } == 2 || uc($self->_next_token) eq 'CASE') {
+                if (uc($last) eq 'AS' || $self->{ '_is_in_create' } == 2 || uc($self->_next_token) eq 'CASE') {
                     $self->_new_line;
                 }
                 if ($self->{ '_is_in_with' } == 1) {
